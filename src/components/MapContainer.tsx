@@ -89,7 +89,13 @@ const getDriverIcon = (type: VehicleType, heading = 0) => {
 const RecenterMap: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
   const map = useMap();
   useEffect(() => {
-    map.setView(center, zoom);
+    if (map) {
+      try {
+        map.setView(center, zoom);
+      } catch (e) {
+        // Safe fallback if map is not fully initialized or already unmounted
+      }
+    }
   }, [center, zoom, map]);
   return null;
 };
@@ -98,9 +104,13 @@ const RecenterMap: React.FC<{ center: [number, number]; zoom: number }> = ({ cen
 const FitRouteBounds: React.FC<{ coordinates: [number, number][] }> = ({ coordinates }) => {
   const map = useMap();
   useEffect(() => {
-    if (coordinates.length > 0) {
-      const bounds = L.latLngBounds(coordinates);
-      map.fitBounds(bounds, { padding: [40, 40] });
+    if (map && coordinates.length > 0) {
+      try {
+        const bounds = L.latLngBounds(coordinates);
+        map.fitBounds(bounds, { padding: [40, 40] });
+      } catch (e) {
+        // Safe fallback if map is not fully initialized or already unmounted
+      }
     }
   }, [coordinates, map]);
   return null;
